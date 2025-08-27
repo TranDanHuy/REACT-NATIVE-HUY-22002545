@@ -70,18 +70,34 @@
 // runThrowError();
 
 // Câu 4:
-function randomNumberPromise(): Promise<number> {
-    return new Promise((resolve, reject) => {
-        const num = Math.random();
-        if (num >= 0) resolve(num);
-        else reject("Random number < 0"); 
+// function randomNumberPromise(): Promise<number> {
+//     return new Promise((resolve, reject) => {
+//         const num = Math.random();
+//         if (num >= 0) resolve(num);
+//         else reject("Random number < 0"); 
+//     });
+// }
+
+// randomNumberPromise()
+//     .then((num) => {
+//         console.log("Random number:", num);
+//     })
+//     .catch((err) => {
+//         console.error("Error getting random number:", err);
+//     });
+
+// Câu 5:
+function simulateTask(time: number): Promise<string> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve("Task done");
+        }, time);
     });
 }
 
-randomNumberPromise()
-    .then((num) => {
-        console.log("Random number:", num);
-    })
-    .catch((err) => {
-        console.error("Error getting random number:", err);
-    });
+// Dùng async/await test
+async function runSimulateTask() {
+    const res = await simulateTask(500);
+    console.log(res);
+}
+runSimulateTask();
