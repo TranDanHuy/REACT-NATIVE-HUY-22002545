@@ -19,23 +19,52 @@
 // run();
 
 // Câu 2: Hàm trả về Promise resolve với số 10 sau 1 giây
-function returnTen(): Promise<number> {
-    return new Promise((resolve) => {
+// function returnTen(): Promise<number> {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve(10);
+//         }, 1000);
+//     });
+// }
+
+// Dùng .then()
+// returnTen().then((num) => {
+//     console.log("Trả về với then:", num);
+// });
+
+// Hoặc dùng async/await
+// async function runReturnTen() {
+//     const num = await returnTen();
+//     console.log("Trả về với async/await: ", num);
+// }
+
+// runReturnTen();
+
+// Câu 3: 
+function throwError(): Promise<never> {
+    return new Promise((_, reject) => {
         setTimeout(() => {
-            resolve(10);
+            reject(new Error("Something went wrong"));
         }, 1000);
     });
 }
 
-// Dùng .then()
-returnTen().then((num) => {
-    console.log("Trả về với then:", num);
-});
+// Dùng .then() và .catch()
+throwError()
+    .then(() => {
+        console.log("This will not run");
+    })
+    .catch((err) => {
+        console.error("Caught error with then/catch:", err.message);
+    });
 
-// Hoặc dùng async/await
-async function runReturnTen() {
-    const num = await returnTen();
-    console.log("Trả về với async/await: ", num);
+// Dùng async/await với try/catch
+async function runThrowError() {
+    try {
+        await throwError();
+    } catch (err: any) {
+        console.error("Caught error with async/await:", err.message);
+    }
 }
 
-runReturnTen();
+runThrowError();
