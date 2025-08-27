@@ -41,30 +41,47 @@
 // runReturnTen();
 
 // Câu 3: 
-function throwError(): Promise<never> {
-    return new Promise((_, reject) => {
-        setTimeout(() => {
-            reject(new Error("Something went wrong"));
-        }, 1000);
-    });
-}
+// function throwError(): Promise<never> {
+//     return new Promise((_, reject) => {
+//         setTimeout(() => {
+//             reject(new Error("Something went wrong"));
+//         }, 1000);
+//     });
+// }
 
 // Dùng .then() và .catch()
-throwError()
-    .then(() => {
-        console.log("This will not run");
-    })
-    .catch((err) => {
-        console.error("Caught error with then/catch:", err.message);
-    });
+// throwError()
+//     .then(() => {
+//         console.log("This will not run");
+//     })
+//     .catch((err) => {
+//         console.error("Caught error with then/catch:", err.message);
+//     });
 
 // Dùng async/await với try/catch
-async function runThrowError() {
-    try {
-        await throwError();
-    } catch (err: any) {
-        console.error("Caught error with async/await:", err.message);
-    }
+// async function runThrowError() {
+//     try {
+//         await throwError();
+//     } catch (err: any) {
+//         console.error("Caught error with async/await:", err.message);
+//     }
+// }
+
+// runThrowError();
+
+// Câu 4:
+function randomNumberPromise(): Promise<number> {
+    return new Promise((resolve, reject) => {
+        const num = Math.random();
+        if (num >= 0) resolve(num);
+        else reject("Random number < 0"); 
+    });
 }
 
-runThrowError();
+randomNumberPromise()
+    .then((num) => {
+        console.log("Random number:", num);
+    })
+    .catch((err) => {
+        console.error("Error getting random number:", err);
+    });
