@@ -1,138 +1,124 @@
-import "react-native-reanimated";
-
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import Fontisto from "@expo/vector-icons/Fontisto";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Entypo from '@expo/vector-icons/Entypo';
 
-export default function RootLayout() {
-  const styles = StyleSheet.create({
-    color1: {
-      backgroundColor: "#ccffff",
-      flex: 7,
-    },
-    color2: {
-      backgroundColor: "#ffffff",
-      flex: 1.5,
-      flexDirection: "row",
-      justifyContent: "space-around",
-      alignItems: "center",
-      marginTop: 50,
-    },
-    color3: {
-      backgroundColor: "#80d4ff",
-      flex: 2,
-    },
-    color: {
-      flex: 1,
-    },
-    title: {
-      fontSize: 60,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginTop: 90,
-    },
-    title1: {
-      fontSize: 25,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginTop: 90,
-    },
-    circle: {
-      top: 40,
-      alignSelf: "center",
-    },
-    text: {
-      fontSize: 20,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginTop: 50,
-    },
-    button1: {
-      backgroundColor: "#ffbf00",
-      padding: 20,
-      height: "80%",
-      width: "80%",
-      alignItems: "center",
-      alignSelf: "center",
-    },
-    text2: {
-      fontWeight: "bold",
-      fontSize: 25,
-    },
-    text3: {
-      fontSize: 22,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginTop: -20,
-    },
-    textinput: {
-      flex: 1, // input chiếm hết chỗ còn lại
-      marginLeft: 10, // cách icon 1 khoảng
-      fontSize: 16,
-      paddingVertical: 8,
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      width: "80%",
-      alignSelf: "center",
-      marginTop: 20,
-      backgroundColor: "#B0B0B0",
-    },
-    container1: {
-      flexDirection: "row", // sắp xếp ngang
-      justifyContent: "space-between", // cách đều nhau
-      alignItems: "center",
-      backgroundColor: "#ccffff", // màu nền giống hình bạn gửi
-      padding: 10,
-    },
-    box: {
-      width: 45,
-      height: 45,
-      borderWidth: 1,
-      borderColor: "black",
-      textAlign: "center", // số nằm giữa ô
-      fontSize: 20,
-      marginHorizontal: 5,
-      backgroundColor: "#fff",
-    },
-  });
+
+const styles = StyleSheet.create({
+  bg: {
+    backgroundColor: "#E6FFEF",
+    flex: 1,
+    padding: 25,
+  },
+  text: {
+    fontSize: 35,
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingTop: 50,
+  },
+  textInput: {
+    backgroundColor: "#D6EDE0",
+    fontSize: 20,
+    padding: 18,
+    marginTop: 50,
+    fontWeight: "bold",
+  },
+  textInput1: {
+    backgroundColor: "#D6EDE0",
+    fontSize: 20,
+    padding: 18,
+    fontWeight: "bold",
+    flex: 1,
+    paddingVertical: 15,
+  },
+  view: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#D6EDE0",
+    paddingRight: 20,
+    marginTop: 20,
+  },
+  loginBtn: {
+    backgroundColor: "red",
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 50,
+    alignItems:"center",
+    justifyContent: "center",
+    
+  },
+  text1: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 25
+  },
+  text2:{
+    textAlign: "center",
+    padding: 15,
+    fontWeight: "bold",
+  },
+  text3: {
+    color: "blue",
+    textAlign: "center",
+    
+  },
+  container: {
+    flexDirection: "row",
+    gap: 70,
+    
+  },
+  zalo:{
+    fontSize: 50,
+    fontWeight: "bold",
+    backgroundColor: "white",
+    height:70,
+    width:70,
+    textAlign: "center",
+    color: "blue",
+    borderRadius: 10
+
+  },
+  
+});
+const Layout1D = () => {
   return (
-    <View style={styles.color}>
-      <View style={styles.color1}>
-        <View>
-          <Text style={styles.title}>CODE </Text>
-        </View>
-        <View>
-          <Text style={styles.title1}>VERIFICATION</Text>
-        </View>
-        <View>
-          <Text style={styles.text}>
-            Enter ontime password sent on ++849092605798
-          </Text>
-        </View>
+    <View style={styles.bg}>
+      <Text style={styles.text}>LOGIN</Text>
+      <View>
+        <TextInput placeholder="Name" style={styles.textInput} />
+      </View>
+      <View style={styles.view}>
+        <TextInput placeholder="Password" keyboardType="numeric" maxLength={8} style={styles.textInput1} />
+        <AntDesign name="eye" size={35} color="black" />
       </View>
 
-      <View style={styles.container1}>
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-        <TextInput style={styles.box} maxLength={1} keyboardType="numeric" />
-      </View>
-
-      <View style={styles.color2}>
-        <Pressable style={styles.button1}>
-          <Text style={styles.text2}>VERIFY CODE</Text>
+      <View>
+        <Pressable style={({ pressed }) => [
+          styles.loginBtn,
+          { opacity: pressed ? 0.6 : 1 }, 
+        ]}>
+            <Text style={styles.text1}>LOGIN</Text>
         </Pressable>
       </View>
+      
+        <Text style={styles.text2}>When you agree to terms and conditions</Text>
+      
+      <Pressable>
+        <Text style={styles.text3}>For got your password?</Text>
+      </Pressable>
+      <Text style={styles.text2}>Or login with</Text>
+      <View style={styles.container}>
+        <Pressable>
+            <Entypo name="facebook" size={70} color="blue" />
+        </Pressable>
+        <Pressable>
+            <Text style={styles.zalo}>Z</Text>
+        </Pressable>
+        <Pressable>
+            <AntDesign name="google" size={70} color="red" />
+        </Pressable>
 
-      <View style={styles.color3}></View>
+      </View>
     </View>
   );
-}
+};
+export default Layout1D;
