@@ -153,7 +153,7 @@ const [gender, setGender] = useState<"Male" | "Female" | null>(null);
           { opacity: pressed ? 0.6 : 1 },
         ]}
       >
-        <Text style={styles.text1}>LOGIN</Text>
+        <Text style={styles.text1}>REGISTER</Text>
       </Pressable>
 
       <Text style={styles.text2}>
