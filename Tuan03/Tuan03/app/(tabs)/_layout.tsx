@@ -1,78 +1,174 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
 
 const styles = StyleSheet.create({
   view: {
-    backgroundColor: "#FBCB00",
-    flex: 1,
-    padding: 25,
+    marginTop: 50,
+    alignItems: "center",
   },
-  text: {
-    fontSize: 35,
-    fontWeight: "bold",
-    padding: 35,
-    paddingTop: 70,
+  img: {
+    width: 200,
+    height: 200,
+  },
+  textInput: {
+    fontSize: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginTop: 20,
+    width: 250,
   },
   view1: {
     flexDirection: "row",
-    borderWidth: 1,
-    borderColor: "white",
-    paddingVertical: 10,
-    padding: 18,
-    backgroundColor: "#C4C4C44D",
     alignItems: "center",
-    marginTop: 20,
-    paddingRight: 20
+    borderBottomWidth: 1,
+    borderBottomColor: "#999",
   },
-  textInput: {
-    fontWeight: "bold",
-    marginLeft: 10
+  user: {
+    marginTop: 15,
+    color: "blue",
   },
   press: {
     marginTop: 40,
-    backgroundColor: "#060000",
-    padding: 10
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 15
   },
-  text2:{
-    fontSize: 35,
+  text2: {
+    fontSize: 25,
     color: "white",
     textAlign: "center",
+    
+    
+  },
+  container: {
+    width: "80%",
+    paddingVertical: 10,
+    padding: 20,
+
+  },
+  view3:{
+    flexDirection: "row",
+    gap: 60,
+    marginTop: 10,
+    
+
+  },
+  text3:{
+    fontSize: 20,
     fontWeight: "bold",
 
   },
-  text3: {
-    marginTop: 40,
+   dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20,
+    width: "80%",
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "blue",
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    fontSize: 20,
     fontWeight: "bold",
-    fontSize: 25,
-    textAlign: "center"
+  },
+  container1: {
+    flexDirection: "row",
+    gap: 30
+  },
+  user1: {
+    marginTop:4,
+    backgroundColor: "#42A5F5",
+    padding: 5,
+    borderRadius: 10,
+    color: "white",
+
+  },
+  wifi: {
+    marginTop:4,
+    backgroundColor: "#F4A432",
+    padding: 7,
+    borderRadius: 10,
+    color: "white",
 
   }
-  
 });
 
-const Layout2A = () => {
+const Layout2B = () => {
   return (
     <View style={styles.view}>
-      <Text style={styles.text}>LOGIN</Text>
+      <Image
+        source={require("../../assets/images/camera.png")}
+        style={styles.img}
+      />
       <View style={styles.view1}>
-        <FontAwesome name="user" size={24} color="black" />
-        <TextInput placeholder="Name" style={styles.textInput} />
+        <FontAwesome5 name="user" size={24} color="black" style={styles.user} />
+        <TextInput
+          placeholder="Please input user name"
+          placeholderTextColor="#999"
+          style={styles.textInput}
+        />
       </View>
       <View style={styles.view1}>
-        <FontAwesome6 name="unlock-keyhole" size={24} color="black" />
-        <TextInput placeholder="Password" style={styles.textInput} keyboardType="numeric" maxLength={8} />
-        <AntDesign name="eye" size={24} color="black" />
+        <FontAwesome6
+          name="unlock-keyhole"
+          size={24}
+          color="black"
+          style={styles.user}
+        />
+        <TextInput
+          placeholder="Please input password"
+          placeholderTextColor="#999"
+          style={styles.textInput}
+        />
       </View>
-      <Pressable   style={({ pressed }) => [
-          styles.press,
-          { opacity: pressed ? 0.6 : 1 },
-        ]} >
+     <View style={styles.container}>
+         <Pressable
+        style={({ pressed }) => [styles.press, { opacity: pressed ? 0.6 : 1 }]}
+      >
         <Text style={styles.text2}>LOGIN</Text>
       </Pressable>
-      <Text style= {styles.text3}>CREATE ACCOUNT</Text>
+     </View>
+     <View style={styles.view3}>
+      <Text style={styles.text3}>Register</Text>
+      <Text style={styles.text3}>Forgot Password</Text>
+     </View>
+     <View style={styles.dividerContainer}>
+        <View style={styles.line} />
+        <Text style={styles.dividerText}>Other Login Methods</Text>
+        <View style={styles.line} />
+      </View>
+      <View style={styles.container1}>
+        <Pressable>
+            <FontAwesome6 name="user-plus" size={50} color="black" style={styles.user1} />
+        </Pressable>
+
+        <Pressable>
+            <AntDesign name="wifi" size={50} color="black" style={styles.wifi} />
+        </Pressable>
+
+        
+
+         <Pressable>
+            <Entypo name="facebook" size={70} color="blue" />
+        </Pressable>
+
+      </View>
+
     </View>
   );
 };
-export default Layout2A;
+export default Layout2B;
