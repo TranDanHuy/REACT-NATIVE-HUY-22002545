@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext, createContext } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
+  FlatList,
   Pressable,
   ActivityIndicator,
-  TextInput,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,8 +14,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const API_URL = "https://68d33d65cc7017eec5465173.mockapi.io/phoneApp";
-const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const localImages = {
   "1": require("./assets/anhdautien.PNG"),
@@ -24,212 +24,197 @@ const localImages = {
   "4": require("./assets/anhthu4.PNG"),
 };
 
-// ------------------ Flow Home ------------------
-function Screen1({ navigation }) {
-  const [product, setProduct] = useState(null);
+
+const FavCtx = createContext();
+function FavProvider({ children }) {
+  const [favorites, setFavorites] = useState([]);
+  const addFavorite = (p) =>
+    setFavorites((prev) => (prev.find((x) => x.id === p.id) ? prev : [...prev, p]));
+  const removeFavorite = (id) =>
+    setFavorites((prev) => prev.filter((x) => x.id !== id));
+  return (
+    <FavCtx.Provider value={{ favorites, addFavorite, removeFavorite }}>
+      {children}
+    </FavCtx.Provider>
+  );
+}
+const useFav = () => useContext(FavCtx);
+
+
+function ProductsScreen({ navigation }) {
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(API_URL + "/1")
-      .then((res) => res.json())
+    fetch(API_URL)
+      .then((r) => r.json())
       .then((data) => {
-        setProduct(data);
+        setProducts(data);
         setLoading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((e) => console.error(e));
   }, []);
 
   if (loading) {
     return <ActivityIndicator size="large" color="blue" style={{ marginTop: 50 }} />;
   }
 
-  return (
-    <View style={styles.card}>
-      <Image style={styles.image} source={localImages[product.image]} resizeMode="contain" />
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.rating}>
-        ⭐ {product.rating} ({product.reviews} đánh giá)
-      </Text>
-      <Text style={styles.price}>{product.price.toLocaleString()} đ</Text>
-      <Text style={styles.oldPrice}>{product.oldPrice.toLocaleString()} đ</Text>
-      <Text style={styles.guarantee}>Ở đâu rẻ hơn hoàn tiền</Text>
+  const renderItem = ({ item }) => (
+    <Pressable
+      style={styles.card}
+      onPress={() => navigation.navigate("ProductDetails", { id: item.id })}
+    >
+      <Image source={localImages[item.image]} style={styles.image} resizeMode="contain" />
+      <Text style={styles.title}>{item.name}</Text>
+      <Text style={styles.price}>{Number(item.price).toLocaleString()} đ</Text>
+    </Pressable>
+  );
 
-      <Pressable
-        style={styles.buyBtn}
-        onPress={() => navigation.navigate("Screen2", { product })}
-      >
-        <Text style={styles.buyText}>CHỌN MUA</Text>
-      </Pressable>
-    </View>
+  return (
+    <FlatList
+      data={products}
+      keyExtractor={(it) => it.id}
+      renderItem={renderItem}
+      contentContainerStyle={{ paddingVertical: 8 }}
+    />
   );
 }
 
-function Screen2({ route, navigation }) {
-  const { product } = route.params;
-  const [selected, setSelected] = useState(product.image);
 
-  const colorOptions = [
-    { id: "1", code: "#add8e6" },
-    { id: "2", code: "red" },
-    { id: "3", code: "black" },
-    { id: "4", code: "blue" },
-  ];
+function FavoritesScreen() {
+  const { favorites, removeFavorite } = useFav();
 
-  return (
-    <View style={styles.center}>
-      <Image source={localImages[selected]} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>Chọn một màu bên dưới:</Text>
-
-      <View style={{ flexDirection: "row", marginTop: 10 }}>
-        {colorOptions.map((c) => (
-          <Pressable
-            key={c.id}
-            style={[styles.colorBox, { backgroundColor: c.code }]}
-            onPress={() => setSelected(c.id)}
-          />
-        ))}
+  if (favorites.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.title}>Chưa có sản phẩm nào trong Favorites</Text>
       </View>
+    );
+  }
 
-      <Pressable
-        style={styles.nextBtn}
-        onPress={() => navigation.navigate("Screen3", { product, selected })}
-      >
-        <Text style={styles.buyText}>XONG</Text>
-      </Pressable>
-    </View>
+  return (
+    <FlatList
+      data={favorites}
+      keyExtractor={(it) => it.id}
+      renderItem={({ item }) => (
+        <View style={styles.card}>
+          <Image source={localImages[item.image]} style={styles.image} resizeMode="contain" />
+          <Text style={styles.title}>{item.name}</Text>
+          <Text style={styles.price}>{Number(item.price).toLocaleString()} đ</Text>
+          <Pressable
+            style={[styles.btn, { backgroundColor: "#555" }]}
+            onPress={() => removeFavorite(item.id)}
+          >
+            <Text style={styles.btnText}>XÓA KHỎI FAVORITES</Text>
+          </Pressable>
+        </View>
+      )}
+    />
   );
 }
 
-function Screen3({ route }) {
-  const { product, selected } = route.params;
+
+function ProductDetails({ route }) {
+  const { id } = route.params;
+  const { addFavorite } = useFav();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((e) => console.error(e));
+  }, [id]);
+
+  if (loading || !product) {
+    return <ActivityIndicator size="large" color="blue" style={{ marginTop: 50 }} />;
+  }
 
   return (
     <View style={styles.card}>
-      <Image style={styles.image} source={localImages[selected]} resizeMode="contain" />
+      <Image source={localImages[product.image]} style={styles.image} resizeMode="contain" />
       <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.rating}>
-        ⭐ {product.rating} ({product.reviews} đánh giá)
-      </Text>
-      <Text style={styles.price}>{product.price.toLocaleString()} đ</Text>
-      <Text style={styles.oldPrice}>{product.oldPrice.toLocaleString()} đ</Text>
+      <Text style={styles.rating}>⭐ {product.rating} ({product.reviews} đánh giá)</Text>
+      <Text style={styles.price}>{Number(product.price).toLocaleString()} đ</Text>
+      <Text style={styles.oldPrice}>{Number(product.oldPrice).toLocaleString()} đ</Text>
       <Text style={styles.guarantee}>Ở đâu rẻ hơn hoàn tiền</Text>
 
-      <Pressable style={styles.buyBtn}>
-        <Text style={styles.buyText}>MUA NGAY</Text>
+      <Pressable style={styles.btn} onPress={() => addFavorite(product)}>
+        <Text style={styles.btnText}>THÊM VÀO FAVORITES</Text>
       </Pressable>
     </View>
   );
 }
 
 
-function HomeStack() {
+function HomeTabs() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Screen1" component={Screen1} />
-      <Stack.Screen name="Screen2" component={Screen2} />
-      <Stack.Screen name="Screen3" component={Screen3} />
-    </Stack.Navigator>
-  );
-}
-
-
-function SearchScreen() {
-  const [keyword, setKeyword] = useState("");
-  return (
-    <View style={styles.center}>
-      <Text style={styles.title}>Nhập từ khóa tìm kiếm:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập tại đây..."
-        value={keyword}
-        onChangeText={setKeyword}
-      />
-      <Text style={styles.result}>🔎 Từ khóa: {keyword}</Text>
-    </View>
-  );
-}
-
-
-function ProfileScreen() {
-  return (
-    <View style={styles.center}>
-      <Image
-        source={{ uri: "https://i.pravatar.cc/150?img=3" }}
-        style={styles.avatar}
-      />
-      <Text style={styles.name}>Trần Đan Huy</Text>
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color, size }) => {
+          const icon = route.name === "Products" ? "pricetags-outline" : "heart-outline";
+          return <Ionicons name={icon} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "tomato",
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
+      <Tab.Screen name="Products" component={ProductsScreen} />
+      <Tab.Screen name="Favorites" component={FavoritesScreen} />
+    </Tab.Navigator>
   );
 }
 
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => {
-            let iconName;
-            if (route.name === "Home") iconName = "home-outline";
-            else if (route.name === "Search") iconName = "search-outline";
-            else if (route.name === "Profile") iconName = "person-outline";
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "tomato",
-          tabBarInactiveTintColor: "gray",
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeStack} />
-        <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <FavProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="HomeTabs"
+            component={HomeTabs}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="ProductDetails" component={ProductDetails} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </FavProvider>
   );
 }
+
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 8,
-    margin: 16,
+    margin: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 2,
   },
-  image: { width: 200, height: 200, borderRadius: 8, marginBottom: 10 },
-  title: { fontSize: 14, fontWeight: "500", marginVertical: 6 },
+  image: { width: 150, height: 150, borderRadius: 8, marginBottom: 10 },
+  title: { fontSize: 16, fontWeight: "600", marginVertical: 6, textAlign: "center" },
   rating: { fontSize: 12, color: "#666" },
   price: { fontSize: 18, fontWeight: "bold", color: "red", marginTop: 6 },
   oldPrice: { fontSize: 14, textDecorationLine: "line-through", color: "#888" },
   guarantee: { fontSize: 12, color: "red", marginTop: 4 },
-  buyBtn: {
-    backgroundColor: "red",
-    borderRadius: 6,
-    padding: 12,
-    marginTop: 12,
-    alignItems: "center",
-    width: "100%",
-  },
-  buyText: { color: "#fff", fontSize: 15, fontWeight: "bold", textAlign: "center" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  colorBox: { width: 60, height: 60, margin: 10, borderRadius: 8 },
-  nextBtn: {
-    backgroundColor: "blue",
-    padding: 12,
-    marginTop: 20,
-    borderRadius: 6,
-    width: 120,
-    alignItems: "center",
+  btn: {
+    backgroundColor: "tomato",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 12,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    width: "80%",
-    borderRadius: 6,
-    marginTop: 20,
-  },
-  result: { fontSize: 16, color: "blue", marginTop: 20 },
-  avatar: { width: 120, height: 120, borderRadius: 60, marginBottom: 10 },
-  name: { fontSize: 18, fontWeight: "bold" },
+  btnText: { color: "#fff", fontWeight: "700" },
 });
